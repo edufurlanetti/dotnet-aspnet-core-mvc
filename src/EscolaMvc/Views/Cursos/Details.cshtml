@@ -1,0 +1,72 @@
+@model Curso
+@{
+    ViewData["Title"] = Model.Nome;
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h1 class="h3 mb-1">@Model.Nome</h1>
+        <span class="badge text-bg-primary">@Formatacao.Exibir(Model.Area)</span>
+        @if (!Model.Ativo)
+        {
+            <span class="badge text-bg-secondary">Inativo</span>
+        }
+    </div>
+    <div class="d-flex gap-2">
+        @if (Model.Ativo && Model.VagasLivres > 0)
+        {
+            <a asp-controller="Matriculas" asp-action="Create" asp-route-cursoId="@Model.Id" class="btn btn-success">
+                <i class="bi bi-person-plus"></i> Matricular aluno
+            </a>
+        }
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary"><i class="bi bi-pencil"></i> Editar</a>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.Descricao))
+{
+    <p class="lead">@Model.Descricao</p>
+}
+
+<dl class="row bg-white shadow-sm rounded p-3">
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.CargaHoraria)</dt>
+    <dd class="col-sm-9">@Model.CargaHoraria horas</dd>
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.DataInicio)</dt>
+    <dd class="col-sm-9">@Formatacao.Data(Model.DataInicio)</dd>
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Valor)</dt>
+    <dd class="col-sm-9">@Formatacao.Reais(Model.Valor)</dd>
+    <dt class="col-sm-3">Ocupação</dt>
+    <dd class="col-sm-9">
+        @{ var percentual = Model.Vagas == 0 ? 0 : 100 * Model.VagasOcupadas / Model.Vagas; }
+        <div class="progress" role="progressbar" aria-valuenow="@percentual" aria-valuemin="0" aria-valuemax="100" style="max-width: 320px">
+            <div class="progress-bar @(percentual >= 100 ? "bg-danger" : "")" style="width: @percentual%">@Model.VagasOcupadas / @Model.Vagas</div>
+        </div>
+    </dd>
+</dl>
+
+<h2 class="h5 mt-4">Matrículas</h2>
+@if (Model.Matriculas.Count == 0)
+{
+    <p class="text-muted">Nenhuma matrícula até o momento.</p>
+}
+else
+{
+    <table class="table table-sm bg-white shadow-sm">
+        <thead class="table-light">
+            <tr><th>Aluno</th><th>Data</th><th>Situação</th><th class="text-end">Nota</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var matricula in Model.Matriculas.OrderBy(m => m.Aluno!.Nome))
+            {
+                <tr>
+                    <td><a asp-controller="Alunos" asp-action="Details" asp-route-id="@matricula.AlunoId">@matricula.Aluno!.Nome</a></td>
+                    <td>@Formatacao.Data(matricula.DataMatricula)</td>
+                    <td>@Formatacao.Exibir(matricula.Status)</td>
+                    <td class="text-end">@Formatacao.Nota(matricula.NotaFinal)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-action="Index" class="btn btn-link px-0"><i class="bi bi-arrow-left"></i> Voltar para a lista</a>

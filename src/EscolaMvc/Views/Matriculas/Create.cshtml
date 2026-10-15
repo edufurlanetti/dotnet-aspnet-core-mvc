@@ -1,0 +1,37 @@
+@model NovaMatriculaViewModel
+@{
+    ViewData["Title"] = "Nova matrícula";
+}
+
+<h1 class="h3 mb-3">Nova matrícula</h1>
+
+<form asp-action="Create" method="post" class="card card-body shadow-sm" style="max-width: 640px">
+    @* Mostra erros de regra de negócio (sem vagas, já matriculado...) *@
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="AlunoId" class="form-label"></label>
+        <select asp-for="AlunoId" asp-items="ViewBag.Alunos" class="form-select">
+            <option value="">Selecione...</option>
+        </select>
+        <span asp-validation-for="AlunoId"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CursoId" class="form-label"></label>
+        <select asp-for="CursoId" asp-items="ViewBag.Cursos" class="form-select">
+            <option value="">Selecione...</option>
+        </select>
+        <span asp-validation-for="CursoId"></span>
+        <div class="form-text">Cursos sem vagas aparecem desabilitados.</div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Matricular</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

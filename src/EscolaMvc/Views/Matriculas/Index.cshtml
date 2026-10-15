@@ -1,0 +1,64 @@
+@model IEnumerable<Matricula>
+@{
+    ViewData["Title"] = "Matrículas";
+    var statusAtual = ViewData["Status"] as StatusMatricula?;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h3 m-0">Matrículas</h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova matrícula</a>
+</div>
+
+<ul class="nav nav-pills mb-3">
+    <li class="nav-item"><a class="nav-link @(statusAtual is null ? "active" : "")" asp-action="Index">Todas</a></li>
+    @foreach (var status in Enum.GetValues<StatusMatricula>())
+    {
+        <li class="nav-item">
+            <a class="nav-link @(statusAtual == status ? "active" : "")" asp-action="Index" asp-route-status="@status">@Formatacao.Exibir(status)</a>
+        </li>
+    }
+</ul>
+
+<div class="table-responsive">
+    <table class="table table-hover bg-white shadow-sm">
+        <thead class="table-light">
+            <tr><th>Aluno</th><th>Curso</th><th>Data</th><th>Situação</th><th class="text-end">Nota</th><th class="text-end">Ações</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var m in Model)
+            {
+                var cor = m.Status switch
+                {
+                    StatusMatricula.Ativa => "text-bg-primary",
+                    StatusMatricula.Concluida => "text-bg-success",
+                    _ => "text-bg-secondary"
+                };
+                <tr>
+                    <td><a asp-controller="Alunos" asp-action="Details" asp-route-id="@m.AlunoId">@m.Aluno!.Nome</a></td>
+                    <td><a asp-controller="Cursos" asp-action="Details" asp-route-id="@m.CursoId">@m.Curso!.Nome</a></td>
+                    <td>@Formatacao.Data(m.DataMatricula)</td>
+                    <td>
+                        <span class="badge @cor">
+                            @Formatacao.Exibir(m.Status)
+                        </span>
+                    </td>
+                    <td class="text-end">@Formatacao.Nota(m.NotaFinal)</td>
+                    <td class="text-end">
+                        @if (m.Status == StatusMatricula.Ativa)
+                        {
+                            <form asp-action="Concluir" asp-route-id="@m.Id" method="post" class="d-inline-flex gap-1">
+                                <input type="number" name="nota" min="0" max="10" step="0.1" required
+                                       class="form-control form-control-sm" style="width: 5rem" placeholder="Nota" aria-label="Nota final" />
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Concluir"><i class="bi bi-check2"></i></button>
+                            </form>
+                            <form asp-action="Cancelar" asp-route-id="@m.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Cancelar esta matrícula?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

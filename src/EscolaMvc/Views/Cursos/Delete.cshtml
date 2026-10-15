@@ -1,0 +1,26 @@
+@model Curso
+@{
+    ViewData["Title"] = "Excluir curso";
+}
+
+<h1 class="h3 mb-3">Excluir curso</h1>
+
+<div class="card shadow-sm border-danger">
+    <div class="card-body">
+        <p>Confirma a exclusão de <strong>@Model.Nome</strong>?</p>
+        @if (Model.Matriculas.Count > 0)
+        {
+            <div class="alert alert-warning mb-0">
+                <i class="bi bi-info-circle"></i>
+                O curso possui @Model.Matriculas.Count matrícula(s). Para preservar o histórico,
+                ele será <strong>desativado</strong> em vez de excluído.
+            </div>
+        }
+    </div>
+    <div class="card-footer bg-white">
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Confirmar</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>

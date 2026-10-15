@@ -1,0 +1,60 @@
+@model PainelViewModel
+@{
+    ViewData["Title"] = "Painel";
+}
+
+<h1 class="h3 mb-4">Painel de cursos de extensão</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card card-indicador shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Cursos ativos</div>
+            <div class="valor">@Model.TotalCursos</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card card-indicador shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Alunos cadastrados</div>
+            <div class="valor">@Model.TotalAlunos</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card card-indicador shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Matrículas ativas</div>
+            <div class="valor">@Model.MatriculasAtivas</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card card-indicador shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Receita prevista</div>
+            <div class="valor">@Formatacao.Reais(Model.ReceitaPrevista)</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold"><i class="bi bi-exclamation-circle text-warning"></i> Cursos com poucas vagas</div>
+    @if (Model.CursosComPoucasVagas.Count == 0)
+    {
+        <div class="card-body text-muted">Todos os cursos têm vagas disponíveis.</div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var curso in Model.CursosComPoucasVagas)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a asp-controller="Cursos" asp-action="Details" asp-route-id="@curso.Id">@curso.Nome</a>
+                    @if (curso.VagasLivres <= 0)
+                    {
+                        <span class="badge text-bg-danger">Esgotado</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-warning">@curso.VagasLivres vaga(s)</span>
+                    }
+                </li>
+            }
+        </ul>
+    }
+</div>

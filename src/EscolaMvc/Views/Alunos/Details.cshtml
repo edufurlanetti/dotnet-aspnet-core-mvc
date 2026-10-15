@@ -1,0 +1,45 @@
+@model Aluno
+@{
+    ViewData["Title"] = Model.Nome;
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <h1 class="h3 m-0">@Model.Nome</h1>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary"><i class="bi bi-pencil"></i> Editar</a>
+</div>
+
+<dl class="row bg-white shadow-sm rounded p-3">
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Email)</dt>
+    <dd class="col-sm-9"><a href="mailto:@Model.Email">@Model.Email</a></dd>
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Telefone)</dt>
+    <dd class="col-sm-9">@(Model.Telefone ?? "—")</dd>
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.DataNascimento)</dt>
+    <dd class="col-sm-9">@Formatacao.Data(Model.DataNascimento)</dd>
+</dl>
+
+<h2 class="h5 mt-4">Histórico de cursos</h2>
+@if (Model.Matriculas.Count == 0)
+{
+    <p class="text-muted">O aluno ainda não se matriculou em nenhum curso.</p>
+}
+else
+{
+    <table class="table table-sm bg-white shadow-sm">
+        <thead class="table-light">
+            <tr><th>Curso</th><th>Matrícula</th><th>Situação</th><th class="text-end">Nota</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var matricula in Model.Matriculas.OrderByDescending(m => m.DataMatricula))
+            {
+                <tr>
+                    <td><a asp-controller="Cursos" asp-action="Details" asp-route-id="@matricula.CursoId">@matricula.Curso!.Nome</a></td>
+                    <td>@Formatacao.Data(matricula.DataMatricula)</td>
+                    <td>@Formatacao.Exibir(matricula.Status)</td>
+                    <td class="text-end">@Formatacao.Nota(matricula.NotaFinal)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-action="Index" class="btn btn-link px-0"><i class="bi bi-arrow-left"></i> Voltar para a lista</a>

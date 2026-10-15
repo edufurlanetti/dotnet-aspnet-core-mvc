@@ -1,0 +1,81 @@
+@model IEnumerable<Curso>
+@{
+    ViewData["Title"] = "Cursos";
+
+    // Lista de áreas para o filtro, mantendo selecionada a área pesquisada
+    var areaSelecionada = ViewData["Area"] as AreaCurso?;
+    var areas = Html.GetEnumSelectList<AreaCurso>().ToList();
+    foreach (var item in areas)
+    {
+        item.Selected = areaSelecionada.HasValue && item.Value == ((int)areaSelecionada.Value).ToString();
+    }
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h3 m-0">Cursos</h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo curso</a>
+</div>
+
+<form asp-action="Index" method="get" class="row g-2 mb-3">
+    <div class="col-sm-6 col-lg-4">
+        <input type="search" name="busca" value="@ViewData["Busca"]" class="form-control" placeholder="Buscar pelo nome..." />
+    </div>
+    <div class="col-sm-4 col-lg-3">
+        <select name="area" class="form-select" asp-items="areas">
+            <option value="">Todas as áreas</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i> Filtrar</button>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Nenhum curso encontrado.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle bg-white shadow-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>@Html.DisplayNameFor(m => m.Nome)</th>
+                    <th>@Html.DisplayNameFor(m => m.Area)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.CargaHoraria)</th>
+                    <th>@Html.DisplayNameFor(m => m.DataInicio)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.Valor)</th>
+                    <th class="text-center">Vagas</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var curso in Model)
+                {
+                    <tr class="@(curso.Ativo ? "" : "text-muted")">
+                        <td>
+                            <a asp-action="Details" asp-route-id="@curso.Id">@curso.Nome</a>
+                            @if (!curso.Ativo)
+                            {
+                                <span class="badge text-bg-secondary ms-1">Inativo</span>
+                            }
+                        </td>
+                        <td>@Formatacao.Exibir(curso.Area)</td>
+                        <td class="text-end">@curso.CargaHoraria h</td>
+                        <td>@Formatacao.Data(curso.DataInicio)</td>
+                        <td class="text-end">@Formatacao.Reais(curso.Valor)</td>
+                        <td class="text-center">
+                            <span class="badge @(curso.VagasLivres > 0 ? "text-bg-success" : "text-bg-danger")">
+                                @curso.VagasOcupadas / @curso.Vagas
+                            </span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <a asp-action="Delete" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
